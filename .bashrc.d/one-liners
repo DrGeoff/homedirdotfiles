@@ -1,0 +1,25 @@
+check_source()
+{
+    if [[ -f "$1" ]]; then
+        source "$1"
+    fi
+}
+
+#export PYTHONPATH=/home/geoff/ten2/repo:/home/geoff/code/3rdparty/Uranium
+export WAREHOUSE=$HOME/ten2/warehouse
+export CDPATH="."
+export PATH=$HOME/compiletools:$HOME/.npm-global/bin:$HOME/bin:/home/geoff/code/llama.cpp/build/bin:$PATH
+export TZ=:/etc/localtime
+export SSH_ASKPASS=/usr/libexec/openssh/gnome-ssh-askpass
+export GIT_ASKPASS=/usr/libexec/openssh/gnome-ssh-askpass
+
+alias ll='ls -l'
+alias xo='xdg-open'
+
+# mvd()
+# {
+#     # Move from downloads to current working directory
+#     numfiles="$1"
+#     ls -1tr ~/Downloads/ |tail -${numfiles}|while read name;do mv ~/Downloads/"$name" .; done
+# }
+

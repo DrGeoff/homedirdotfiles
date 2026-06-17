@@ -1,0 +1,8 @@
+# Provide preexec/precmd hooks that atuin needs (Fedora doesn't package bash-preexec)
+[[ -f /usr/share/ghostty/shell-integration/bash/bash-preexec.sh ]] && source /usr/share/ghostty/shell-integration/bash/bash-preexec.sh
+
+# Initialize atuin itself. /etc/profile.d/atuin.sh (from atuin-all-users) only runs
+# for login shells, but .bashrc runs for every interactive shell, so do the init
+# here too. The __atuin_initialized include guard makes the re-source a no-op on
+# login shells. Sourcing after bash-preexec ensures the correct preexec backend.
+[[ $- == *i* && -f /usr/libexec/atuin/atuin-init.bash ]] && source /usr/libexec/atuin/atuin-init.bash

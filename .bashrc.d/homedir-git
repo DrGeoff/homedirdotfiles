@@ -1,0 +1,73 @@
+# Usage:
+
+# Initial setup:
+# config-onetime-init   # Creates the git repo to store the $HOME dotfiles
+
+# Replicate home directory dot files to another machine:
+# config-replicate
+
+# The usual git commands are used with the below "config" git alias. For example
+# config status
+# config add .vimrc
+# config commit -m "Add vimrc"
+# config push
+
+# Original source
+# https://news.ycombinator.com/item?id=11071754
+# and post that, blogs
+# https://www.atlassian.com/git/tutorials/dotfiles
+# https://github.com/Siilwyn/my-dotfiles/tree/master/.my-dotfiles
+#
+# The technique consists in storing a Git bare repository in a "side" folder (e.g., $HOME/.homedirgit) 
+# using a specially crafted alias so that commands are run against that repository 
+# and not the usual .git local folder, which would interfere with any other Git repositories around.
+
+GITHUB_USER=$(grep 'name ' $HOME/.gitconfig |cut -d= -f2 |xargs)
+GITHUB_REPO="git@github.com:$GITHUB_USER/homedirdotfiles.git"
+LOCAL_REPO="$HOME/.homedirgit"
+# Make it easier to interact with the home directory git repo
+alias config="/usr/bin/git --git-dir=$LOCAL_REPO --work-tree=$HOME"
+
+# Only need this on the very first time.  Here for posterity.
+# Locally, call config-onetime-init
+# Then go create the github repository 
+config-onetime-init()
+{
+    git init --bare $HOME/.homedirgit   # Bare repo because we want the data to be in $HOME 
+    # Make sure to hide files in $HOME that aren't being tracked 
+    # to stop git whinging about all these untracked files
+    config config --local status.showUntrackedFiles no
+    local cmd="config remote add origin $GITHUB_REPO"
+    echo Setting up remote repo with "$cmd"
+    eval "$cmd"
+
+    # Avoid any weird recursion problems
+    echo "$LOCAL_REPO" >> $HOME/.gitignore
+
+    echo Remember to go to github and create $GITHUB_REPO
+    echo And on the first push use
+    echo config push -u origin master
+}
+
+config-replicate()
+{
+    # Avoid any weird recursion problems
+    echo "$LOCAL_REPO" >> $HOME/.gitignore
+
+    # Clone the github homedirdotfiles repository
+    git clone --bare "$GITHUB_REPO" "$LOCAL_REPO"
+
+    # Checkout the dot files and backup any conflicts
+    local BACKUP=.config-backup
+    mkdir -p $BACKUP
+    config checkout
+    if [[ $? = 0 ]]; then
+        echo "Checked out config.";
+    else
+        echo "Backing up pre-existing dot files to $BACKUP";
+        config checkout 2>&1 | egrep "\s+\." | awk {'print $1'} | xargs -I{} mv {} ${BACKUP}/{}
+    fi
+    config checkout
+    config config --local status.showUntrackedFiles no
+}
+

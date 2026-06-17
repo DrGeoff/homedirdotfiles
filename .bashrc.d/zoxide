@@ -1,0 +1,4 @@
+eval "$(zoxide init bash)"
+# muscle-memory aliases for the retired jumpmarks commands
+alias jj='z'
+alias jump='z'
