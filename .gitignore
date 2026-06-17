@@ -1,2 +1,10 @@
-/home/geoff/.homedirgit
-/home/geoff/.secrets/
+# Patterns are relative to the work-tree root ($HOME). Keep them path-relative
+# (no leading-slash absolute paths) so they (a) actually match and (b) don't
+# leak a username into this public repo.
+
+# The bare dotfile repo itself.
+.homedirgit/
+
+# Untracked secret store and machine-local secret config — never publish.
+.secrets/
+.config/secret.local

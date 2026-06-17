@@ -1,0 +1,22 @@
+# keepass-env — resolve the KeePassXC database path for secret().
+#
+# This file is PUBLIC (tracked in the dotfiles repo), so it must contain NO
+# database path or personal detail. The actual path is supplied per machine.
+#
+# Resolution order:
+#   1. an already-set $KPXC_DB (e.g. exported elsewhere in your environment)
+#   2. ~/.config/secret.local   (untracked, gitignored; e.g. export KPXC_DB=...)
+#   3. autodetect: exactly one *.kdbx in $HOME
+# If none resolve, secret() simply skips the keepassxc-cli backend.
+
+_secret_local="${XDG_CONFIG_HOME:-$HOME/.config}/secret.local"
+[ -r "$_secret_local" ] && . "$_secret_local"
+unset _secret_local
+
+if [ -z "${KPXC_DB:-}" ]; then
+    _kdbx=( "$HOME"/*.kdbx )
+    if [ "${#_kdbx[@]}" -eq 1 ] && [ -r "${_kdbx[0]}" ]; then
+        export KPXC_DB="${_kdbx[0]}"
+    fi
+    unset _kdbx
+fi
