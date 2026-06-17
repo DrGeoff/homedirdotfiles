@@ -37,6 +37,8 @@ config-onetime-init()
     # Make sure to hide files in $HOME that aren't being tracked 
     # to stop git whinging about all these untracked files
     config config --local status.showUntrackedFiles no
+    # Enable the pre-commit secret scanner (hooks are not carried by git clone).
+    config config --local core.hooksPath "$HOME/.config/git/hooks"
     local cmd="config remote add origin $GITHUB_REPO"
     echo Setting up remote repo with "$cmd"
     eval "$cmd"
@@ -69,5 +71,7 @@ config-replicate()
     fi
     config checkout
     config config --local status.showUntrackedFiles no
+    # Enable the pre-commit secret scanner (hooks are not carried by git clone).
+    config config --local core.hooksPath "$HOME/.config/git/hooks"
 }
 

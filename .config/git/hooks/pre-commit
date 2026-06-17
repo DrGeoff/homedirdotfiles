@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# pre-commit hook for the homedirdotfiles repo: scan staged changes for secrets.
+# Enabled per-repo via:  git config --local core.hooksPath ~/.config/git/hooks
+exec "$(dirname "$0")/secret-scan"
