@@ -5,7 +5,7 @@
 #
 # Resolution order:
 #   1. an already-set $KPXC_DB (e.g. exported elsewhere in your environment)
-#   2. ~/.config/secret.local   (untracked, gitignored; e.g. export KPXC_DB=...)
+#   2. ~/.config/secret.local   (untracked, gitignored; e.g. export KPXC_DB="some.kdbx")
 #   3. autodetect: exactly one *.kdbx in $HOME
 # If none resolve, secret() simply skips the keepassxc-cli backend.
 
