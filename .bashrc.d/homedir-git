@@ -6,6 +6,9 @@
 # Replicate home directory dot files to another machine:
 # config-replicate
 
+# Summarise the repo state (branch, ahead/behind, uncommitted changes):
+# config-status
+
 # The usual git commands are used with the below "config" git alias. For example
 # config status
 # config add .vimrc
@@ -73,5 +76,37 @@ config-replicate()
     config config --local status.showUntrackedFiles no
     # Enable the pre-commit secret scanner (hooks are not carried by git clone).
     config config --local core.hooksPath "$HOME/.config/git/hooks"
+}
+
+# config-status: summarise the state of the home-directory dotfiles repo —
+# branch, position relative to the last-fetched remote, and any uncommitted
+# tracked changes (untracked files are hidden by status.showUntrackedFiles).
+config-status()
+{
+    if ! config rev-parse --is-bare-repository >/dev/null 2>&1; then
+        echo "homedirdotfiles repo not initialised (run config-onetime-init or config-replicate)"
+        return 1
+    fi
+
+    echo "repo:    $LOCAL_REPO"
+    echo "branch:  $(config rev-parse --abbrev-ref HEAD 2>/dev/null)"
+    echo "last:    $(config log -1 --pretty='%h %s (%cr)' 2>/dev/null)"
+
+    if config rev-parse --abbrev-ref '@{upstream}' >/dev/null 2>&1; then
+        local up ahead behind
+        up=$(config rev-parse --abbrev-ref '@{upstream}')
+        ahead=$(config rev-list --count '@{upstream}..HEAD' 2>/dev/null)
+        behind=$(config rev-list --count 'HEAD..@{upstream}' 2>/dev/null)
+        echo "remote:  $up  (ahead $ahead, behind $behind; vs last fetch)"
+    else
+        echo "remote:  (no upstream configured)"
+    fi
+
+    if [ -n "$(config status --porcelain 2>/dev/null)" ]; then
+        echo "changes: (tracked; untracked hidden)"
+        config status --short
+    else
+        echo "changes: clean"
+    fi
 }
 
