@@ -8,3 +8,6 @@
 # Untracked secret store and machine-local secret config — never publish.
 .secrets/
 .config/secret.local
+
+# Other dotfiles that are installed other ways
+.bashrc.d/kbs
