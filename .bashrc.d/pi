@@ -1,5 +1,29 @@
-# pi / pi-ro — launch the pi agent with API keys from the KeePassXC vault
-# (entries named after the env vars, see ~/.bashrc.d/secret). Exported only into pi.
+# pi / pi-ro — everything we own for launching the pi agent lives here.
+# (~/bin/pi is the pi installer's managed symlink; leave it alone.)
+#
+# Both get API keys from the KeePassXC vault (entries named after the env vars,
+# see ~/.bashrc.d/secret), exported only into pi, asked once per shell.
 _pi_keys=(CEREBRAS_API_KEY=CEREBRAS_API_KEY GEMINI_API_KEY=GEMINI_API_KEY)
-pi()    { withsecret "${_pi_keys[@]}" -- pi "$@"; }
-pi-ro() { withsecret "${_pi_keys[@]}" -- pi-ro "$@"; }
+
+pi() { withsecret "${_pi_keys[@]}" -- pi "$@"; }
+
+# pi-ro: run pi in a bwrap sandbox where the current directory tree is read-only.
+# Everything else is read-only too, except ~/.pi, ~/.pi-lens and /tmp.
+# Mount order matters: later mounts cover earlier ones, so writable binds go last
+# (otherwise running from ~ would re-cover ~/.pi as read-only).
+pi-ro() {
+    withsecret "${_pi_keys[@]}" -- bwrap \
+        --ro-bind / / \
+        --tmpfs /tmp \
+        --ro-bind "$PWD" "$PWD" \
+        --bind "$HOME/.pi" "$HOME/.pi" \
+        --bind "$HOME/.pi-lens" "$HOME/.pi-lens" \
+        --dev /dev \
+        --proc /proc \
+        --chdir "$PWD" \
+        --unshare-user \
+        --die-with-parent \
+        -- "${PI_BIN:-pi}" \
+        --append-system-prompt "Sandbox: the filesystem is read-only except for ~/.pi, ~/.pi-lens and /tmp. Do not attempt writes elsewhere; they will fail." \
+        "$@"
+}
