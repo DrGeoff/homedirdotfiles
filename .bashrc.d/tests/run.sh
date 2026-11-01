@@ -7,7 +7,7 @@
 #   bash ~/.bashrc.d/tests/run.sh
 
 set -u
-HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+HERE="$(CDPATH= cd -- "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 rc=0
 ran=0
