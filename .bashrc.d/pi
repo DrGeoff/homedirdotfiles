@@ -1,0 +1,5 @@
+# pi / pi-ro — launch the pi agent with API keys from the KeePassXC vault
+# (entries named after the env vars, see ~/.bashrc.d/secret). Exported only into pi.
+_pi_keys=(CEREBRAS_API_KEY=CEREBRAS_API_KEY GEMINI_API_KEY=GEMINI_API_KEY)
+pi()    { withsecret "${_pi_keys[@]}" -- pi "$@"; }
+pi-ro() { withsecret "${_pi_keys[@]}" -- pi-ro "$@"; }

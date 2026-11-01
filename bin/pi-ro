@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# pi-ro: run pi in a bwrap sandbox where the current directory tree is read-only.
+# Everything else is read-only too, except ~/.pi, ~/.pi-lens and /tmp.
+set -euo pipefail
+
+DIR="$(pwd)"
+PI="${PI_BIN:-pi}"
+
+# Mount order matters: later mounts cover earlier ones, so writable binds go last
+# (otherwise running from ~ would re-cover ~/.pi as read-only).
+exec bwrap \
+  --ro-bind / / \
+  --tmpfs /tmp \
+  --ro-bind "$DIR" "$DIR" \
+  --bind "$HOME/.pi" "$HOME/.pi" \
+  --bind "$HOME/.pi-lens" "$HOME/.pi-lens" \
+  --dev /dev \
+  --proc /proc \
+  --chdir "$DIR" \
+  --unshare-user \
+  --die-with-parent \
+  -- "$PI" \
+    --append-system-prompt "Sandbox: the filesystem is read-only except for ~/.pi, ~/.pi-lens and /tmp. Do not attempt writes elsewhere; they will fail." \
+    "$@"
