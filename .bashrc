@@ -16,7 +16,7 @@ export PATH
 
 # ble.sh  -- load now and defer attach to the first prompt (ble.sh's own
 # array-safe, $?-preserving deferral); keeps load+attach intent in one place.
-[[ $- == *i* ]] && source ~/.local/share/blesh/ble.sh --attach=prompt
+[[ $- == *i* && -f ~/.local/share/blesh/ble.sh ]] && source ~/.local/share/blesh/ble.sh --attach=prompt
 
 # User specific aliases and functions
 if [ -d ~/.bashrc.d ]; then
@@ -30,7 +30,7 @@ unset bashrc_entry
 
 # opencode
 export PATH=/home/geoff/.opencode/bin:$PATH
-. "$HOME/.cargo/env"
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
 # Snippets above prepend unconditionally, so nested shells pile up duplicates.
 # Drop repeats, keeping each entry's first (i.e. winning) position.
