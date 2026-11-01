@@ -5,7 +5,9 @@ check_source()
     fi
 }
 
-export CDPATH="."
+# Interactive-only: an exported CDPATH makes `cd` print paths inside scripts and
+# breaks `$(cd dir && pwd)`. -n also un-exports one inherited from a parent shell.
+export -n CDPATH="."
 export PATH=$HOME/compiletools:$HOME/.npm-global/bin:$HOME/bin:/home/geoff/code/llama.cpp/build/bin:$PATH
 export TZ=:/etc/localtime
 export SSH_ASKPASS=/usr/libexec/openssh/gnome-ssh-askpass
