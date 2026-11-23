@@ -1,0 +1,2 @@
+export OPENAI_API_KEY="llama.cpp"  # Dummy key required by OpenAI client format
+export OPENAI_MODEL="ggml-org/Qwen3.8-27B-GGUF:Q4_K_M"

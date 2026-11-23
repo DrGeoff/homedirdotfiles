@@ -1,0 +1,3 @@
+# opencode
+export PATH=/home/geoff/.opencode/bin:$PATH
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"

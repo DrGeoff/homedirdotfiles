@@ -28,10 +28,7 @@ if [ -d ~/.bashrc.d ]; then
 fi
 unset bashrc_entry
 
-# opencode
-export PATH=/home/geoff/.opencode/bin:$PATH
-[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
-
 # Snippets above prepend unconditionally, so nested shells pile up duplicates.
 # Drop repeats, keeping each entry's first (i.e. winning) position.
 PATH="$(printf %s "$PATH" | awk -v RS=: -v ORS=: '!seen[$0]++' | sed 's/:$//')"
+
