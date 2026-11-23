@@ -37,7 +37,19 @@ err="$("$SCANNER" 2>&1 >/dev/null)"
 "$SCANNER" >/dev/null 2>&1 && fail "scanner did NOT block a staged fake API key"
 printf '%s' "$err" | grep -qiE 'unrecognized option|Usage: grep' && \
     fail "scanner emitted a grep option-parsing error: $err"
-git rm -q --cached leak.sh; rm -f leak.sh
+git rm -q --cached leak.sh
+rm -f leak.sh
+
+# A staged OpenRouter key must be blocked. Regression: "sk-or-v1-..." has
+# hyphens in the body, so the plain OpenAI "sk-" pattern never matched it.
+printf 'export OR_KEY=%s%s%s\n' "sk-or-" "v1-" "$body" > or_leak.sh
+git add or_leak.sh
+err="$("$SCANNER" 2>&1 >/dev/null)"
+"$SCANNER" >/dev/null 2>&1 && fail "scanner did NOT block a staged fake OpenRouter key"
+printf '%s' "$err" | grep -qiE 'unrecognized option|Usage: grep' && \
+    fail "scanner emitted a grep option-parsing error: $err"
+git rm -q --cached or_leak.sh
+rm -f or_leak.sh
 
 # A staged fake private-key block must also be blocked (regex starts with '-----',
 # which previously broke grep option parsing). Assemble at runtime.
@@ -49,4 +61,6 @@ err="$("$SCANNER" 2>&1 >/dev/null)"
 printf '%s' "$err" | grep -qiE 'unrecognized option|Usage: grep' && \
     fail "scanner emitted a grep option-parsing error on the private-key pattern: $err"
 
-echo "PASS: secret-scan blocks API keys and private keys, allows clean content, no grep errors"
+echo "PASS: secret-scan blocks API keys (incl.
+OpenRouter) and private keys, allows
+clean content, no grep errors"
